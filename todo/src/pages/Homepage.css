@@ -1,0 +1,17 @@
+.lists {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  max-width: 80%;
+  height: fit-content;
+  padding: 10px;
+  background-color: aquamarine;
+}
+.todo {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 2px;
+}
