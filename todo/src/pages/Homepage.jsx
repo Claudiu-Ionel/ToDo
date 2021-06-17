@@ -13,10 +13,12 @@ export const Homepage = () => {
     const formData = new FormData(event.target);
     const userInput = formData.get('add');
     const inputField = document.getElementById('task-input');
+
     const newTodo = {
       todo: userInput,
       IsCompleted: 'F',
     };
+
     if (userInput === '') {
       return;
     } else {
@@ -43,13 +45,16 @@ export const Homepage = () => {
     //   text: newTodo.text,
     //   completed: newTodo.completed,
     // }).then(() => console.log('POSTED'));
-    const getData = async () => {
-      try {
-        const limit = tasksLength + 1;
-        const getTodo = await Axios.get('http://localhost:3001/getTodo');
 
-        console.log(getTodo.data);
-        setTasks(getTodo.data);
+    const getData = async (limit) => {
+      try {
+        limit = 1;
+        const getTodo = await Axios.get(`http://localhost:3001/getTodo/${limit}`, { limit });
+        const data = getTodo.data;
+        console.log(data);
+        setTasks([...tasks].concat(data));
+
+        // setTasks(getTodo.data);
         inputField.value = '';
       } catch (error) {
         console.log(error);
@@ -80,16 +85,17 @@ export const Homepage = () => {
     setTasks([]);
   };
   console.log('tasksLength outside ', tasksLength);
+  console.log(tasks);
   return (
     <>
       <TextInput onSubmit={onSubmit} />
 
       {tasks.length > 0 ? (
         <div>
-          {tasks.map((item) => {
+          {tasks.map((item, index) => {
             console.log(item);
             return (
-              <div className="todo-item" key={item.Id}>
+              <div className="todo-item" key={index}>
                 <h2>{item.todo}</h2>
                 <button onClick={() => deleteTodo(item.Id)}>delete</button>
               </div>

@@ -4,7 +4,7 @@ const cors = require('cors');
 
 var app = express();
 app.use(cors());
-app.use(express.json())
+app.use(express.json());
 
 var db = mysql.createConnection({
   host: 'localhost',
@@ -22,6 +22,22 @@ db.connect((err) => {
 
 })
 
+app.post('/register', (req, res) => {
+  const username = req.body.username;
+  const email = req.body.email;
+  const password = req.body.password;
+
+  db.query('INSERT INTO users (username, email, password) VALUES(?, ?, ?);', [username, email, password],
+    (err, result) => {
+      if (err) {
+        res.send(err);
+      } else {
+        res.send('User registered');
+      }
+    })
+
+})
+
 app.post('/addTodo', (req, res) => {
   const todo = req.body.todo;
   const IsCompleted = req.body.IsCompleted;
@@ -35,12 +51,14 @@ app.post('/addTodo', (req, res) => {
       }
     })
 })
-app.get('/getTodo', (req, res) => {
-  db.query('SELECT Id, todo, IsComplete FROM todos',
+app.get('/getTodo/:limit', (req, res) => {
+  const limit = parseInt(req.params.limit)
+  db.query('SELECT Id, todo, IsComplete FROM todos ORDER BY Id DESC LIMIT ?', limit,
     (err, result) => {
       if (err) {
         console.log(err);
       } else {
+        console.log(limit);
         res.send(result);
       }
     })
