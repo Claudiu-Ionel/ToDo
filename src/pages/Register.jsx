@@ -1,12 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Axios from 'axios';
 import './Register.css';
-
+import '../components/Button';
+import Button from '../components/Button';
+import { Link } from 'react-router-dom';
 const Register = () => {
-  const [usernameReg, setUsernameReg] = useState(null);
-  const [passwordReg, setPasswordReg] = useState(null);
-  const [emailReg, setEmailReg] = useState(null);
+  const [usernameReg, setUsernameReg] = useState('');
+  const [passwordReg, setPasswordReg] = useState('');
+  const [emailReg, setEmailReg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [userRegistered, setUserRegistered] = useState(false);
+  const isEnabled = () => {
+    return usernameReg && passwordReg && emailReg;
+  };
 
   const clearInputValues = () => {
     const inputs = document.querySelectorAll('.input');
@@ -17,6 +23,14 @@ const Register = () => {
     });
   };
 
+  const preventSpaceKey = (e, setState) => {
+    if (e.target.value.indexOf(' ') >= 0) {
+      e.target.value = null;
+      setErrorMsg('please do not use space');
+    } else {
+      setState(e.target.value);
+    }
+  };
   const registerUser = async () => {
     try {
       await Axios.post('http://localhost:3001/register', {
@@ -29,14 +43,15 @@ const Register = () => {
         setPasswordReg(null);
 
         const errNo = response.data?.errno;
-        if (typeof response.data === 'string') {
+        if (response.data === 'User registered') {
           setErrorMsg(response.data);
+          setUserRegistered(true);
         }
         if (errNo === 1062) {
           setErrorMsg('Username already exists');
         }
         if (errNo === 1048) {
-          setErrorMsg('Please fill all the inputs');
+          setErrorMsg('Please fill all the inputs fields');
         }
       });
     } catch (error) {
@@ -47,7 +62,7 @@ const Register = () => {
 
   console.log(usernameReg, emailReg, passwordReg);
   return (
-    <div id="register-wrapper">
+    <div className="form-wrapper">
       <h2>User Registration</h2>
       <div className="flex-row">
         <label htmlFor="register">Username:</label>
@@ -58,7 +73,7 @@ const Register = () => {
           name="register"
           required
           onChange={(e) => {
-            setUsernameReg(e.target.value);
+            preventSpaceKey(e, setUsernameReg);
           }}
         />
       </div>
@@ -71,12 +86,12 @@ const Register = () => {
           name="email"
           required
           onChange={(e) => {
-            setEmailReg(e.target.value);
+            preventSpaceKey(e, setEmailReg);
           }}
         />
       </div>
       <div className="flex-row">
-        <label htmlFor="email">Password:</label>
+        <label htmlFor="reg-password">Password:</label>
         <input
           type="password"
           className="input"
@@ -84,14 +99,22 @@ const Register = () => {
           name="reg-password"
           required
           onChange={(e) => {
-            setPasswordReg(e.target.value);
+            preventSpaceKey(e, setPasswordReg);
           }}
         />
       </div>
-      <button onClick={() => registerUser()}>Register</button>
+      <Button isEnabled={isEnabled()} eventHandler={registerUser} />
+
       <div>
         <h2>{errorMsg}</h2>
       </div>
+      {userRegistered === true ? (
+        <Link to="/login">
+          <button>Go and Log in</button>
+        </Link>
+      ) : (
+        <div></div>
+      )}
     </div>
   );
 };
