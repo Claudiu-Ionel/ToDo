@@ -1,11 +1,21 @@
 import Axios from 'axios';
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useGlobalState } from '../App';
+import { useHistory } from 'react-router-dom';
 
 const Login = () => {
+  const history = useHistory();
+  const globalState = useGlobalState();
+  const userData = globalState.userData;
+  const setUserData = globalState.setUserData;
   const [usernameLog, setUserName] = useState('');
   const [passwordLog, setPassword] = useState('');
   const [errMessage, setErrMessage] = useState('');
+
+  useEffect(() => {
+    setUserData(null);
+  }, []);
 
   const clearInputValues = () => {
     const inputs = document.querySelectorAll('.input');
@@ -23,17 +33,21 @@ const Login = () => {
         username: usernameLog,
         password: passwordLog,
       }).then((response) => {
-        setErrMessage('');
-        clearInputValues();
-        console.log(response);
-        setUserName('');
-        setPassword('');
         const errMsg = response.data?.message;
+
         if (errMsg?.length > 0) {
           setErrMessage(errMsg);
+          setUserData(null);
           setUserName('');
           setPassword('');
           clearInputValues();
+        } else {
+          setErrMessage('');
+          clearInputValues();
+          setUserData(response.data);
+          setUserName('');
+          setPassword('');
+          history.push('/homepage');
         }
       });
     } catch (err) {

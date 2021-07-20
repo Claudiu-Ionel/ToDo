@@ -7,13 +7,13 @@
   width: 400px;
 }
 
-input {
+.form-wrapper input {
   margin: 10px;
   width: 300px;
   padding: 5px;
   font-size: 20px;
 }
-label {
+.form-wrapper label {
   position: absolute;
   left: -62px;
   width: 100px;
@@ -21,7 +21,7 @@ label {
   flex-direction: row;
   justify-content: flex-end;
 }
-button {
+.form-wrapper button {
   width: fit-content;
   padding: 10px;
 }
